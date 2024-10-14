@@ -65,11 +65,31 @@ function closeModalOnClick(btn, popup) {
     });
 }
 
+function validateInput(input, form, maxLength = null) {
+    const submitBtn = form.querySelector("button");
+
+    input.addEventListener("input", () => {
+        const isEmpty = input.value.length === 0;
+        const exceedsMaxLength = maxLength
+            ? input.value.length >= maxLength
+            : false;
+        const isInvalid = !input.validity.valid;
+
+        if (isEmpty || exceedsMaxLength || isInvalid) {
+            input.classList.add("invalid");
+            submitBtn.setAttribute("disabled", true);
+        } else {
+            input.classList.remove("invalid");
+            submitBtn.removeAttribute("disabled");
+        }
+    });
+}
+
 //Функция изменения данных профиля
 function editProfile() {
     openModal(profilePopup);
     const closePopupBtn = profilePopup.querySelector(".popup__close");
-    const submitBtn = document.querySelector(".popup__button");
+    const profileForm = profilePopup.querySelector("form");
 
     const nameInput = profilePopup.querySelector(".popup__input_type_name");
     const majorInput = profilePopup.querySelector(
@@ -82,6 +102,9 @@ function editProfile() {
     nameInput.value = profileTitle.textContent;
     majorInput.value = profileDescription.textContent;
 
+    validateInput(nameInput, profileForm, 40);
+    validateInput(majorInput, profileForm, 200);
+
     closeModalOnClick(closePopupBtn, profilePopup);
 
     function handleProfileFormSubmit(evt) {
@@ -93,7 +116,7 @@ function editProfile() {
         closeModal(profilePopup);
     }
 
-    submitBtn.addEventListener("click", handleProfileFormSubmit);
+    profileForm.addEventListener("submit", handleProfileFormSubmit);
 }
 editProfileBtn.addEventListener("click", editProfile);
 
@@ -106,6 +129,9 @@ function addNewCard() {
     const obj = {};
     const nameInput = cardPopup.querySelector(".popup__input_type_card-name");
     const linkInput = cardPopup.querySelector(".popup__input_type_url");
+
+    validateInput(nameInput, cardForm);
+    validateInput(linkInput, cardForm);
 
     closeModalOnClick(closePopupBtn, cardPopup);
 
@@ -138,21 +164,17 @@ function removeCard(btn) {
 //функция открытия/закрытия попапа для картинки
 function toggleImagePopup(cardImage) {
     openModal(imagePopup);
-    const closeBtn = imagePopup.querySelector(".popup__close");
+    const closePopupBtn = imagePopup.querySelector(".popup__close");
     const image = imagePopup.querySelector("img");
 
     image.setAttribute("src", cardImage.getAttribute("src"));
     image.setAttribute("alt", cardImage.getAttribute("alt"));
 
-    closeBtn.addEventListener("click", () => {
-        closeModal(imagePopup);
-    });
+    closeModalOnClick(closePopupBtn, imagePopup);
 }
 
 placesList.addEventListener("click", (evt) => {
     const target = evt.target;
-    console.log(target);
-
     if (target.classList.contains("card__like-button")) {
         toggleLike(target);
     } else if (target.classList.contains("card__delete-button")) {
