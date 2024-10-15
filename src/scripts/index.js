@@ -1,3 +1,5 @@
+import "../pages/index.css";
+
 const editProfileBtn = document.querySelector(".profile__edit-button");
 const addImageBtn = document.querySelector(".profile__add-button");
 const placesList = document.querySelector(".places__list");
@@ -53,16 +55,38 @@ initialCards.forEach((obj) => {
 
 function openModal(popup) {
     popup.classList.add("popup_is-opened");
+
+    document.addEventListener("keydown", (evt) => closeOnKeydown(evt, popup));
 }
 
 function closeModal(popup) {
     popup.classList.remove("popup_is-opened");
+
+    document.removeEventListener("keydown", (evt) =>
+        closeOnKeydown(evt, popup)
+    );
 }
 
 function closeModalOnClick(btn, popup) {
     btn.addEventListener("click", () => {
         closeModal(popup);
     });
+}
+
+function closeModalOverlay(popup) {
+    popup.addEventListener("click", (evt) => {
+        const target = evt.target;
+
+        if (target === popup) {
+            closeModal(popup);
+        }
+    });
+}
+
+function closeOnKeydown(evt, popup) {
+    if (evt.key === "Escape") {
+        closeModal(popup);
+    }
 }
 
 function validateInput(input, form, maxLength = null) {
@@ -105,6 +129,7 @@ function editProfile() {
     validateInput(nameInput, profileForm, 40);
     validateInput(majorInput, profileForm, 200);
 
+    closeModalOverlay(profilePopup);
     closeModalOnClick(closePopupBtn, profilePopup);
 
     function handleProfileFormSubmit(evt) {
@@ -133,6 +158,7 @@ function addNewCard() {
     validateInput(nameInput, cardForm);
     validateInput(linkInput, cardForm);
 
+    closeModalOverlay(cardPopup);
     closeModalOnClick(closePopupBtn, cardPopup);
 
     function handleCardFormSubmit(evt) {
@@ -170,6 +196,7 @@ function toggleImagePopup(cardImage) {
     image.setAttribute("src", cardImage.getAttribute("src"));
     image.setAttribute("alt", cardImage.getAttribute("alt"));
 
+    closeModalOverlay(imagePopup);
     closeModalOnClick(closePopupBtn, imagePopup);
 }
 
