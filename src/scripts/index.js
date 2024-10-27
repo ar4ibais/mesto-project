@@ -9,9 +9,15 @@ import { removeCard } from "../features/removeCard";
 import { toggleLike } from "../features/toggleLike";
 import { validateInput } from "../features/validateInput";
 
-import "../pages/index.css";
 import { toggleImagePopup } from "../features/toggleImagePopup";
-import { getInitialCards } from "../api/cards/cards";
+import {
+    addLikeToCard,
+    daleteCard,
+    getInitialCards,
+    postCard,
+    removeLikeFromCard,
+} from "../api/cards/cards";
+import "../pages/index.css";
 
 const editProfileBtn = document.querySelector(".profile__edit-button");
 const addImageBtn = document.querySelector(".profile__add-button");
@@ -21,13 +27,16 @@ const profilePopup = document.querySelector(".popup_type_edit");
 const cardPopup = document.querySelector(".popup_type_new-card");
 const imagePopup = document.querySelector(".popup_type_image");
 
-getInitialCards()
-    .then((res) => res.json())
-    .then((data) => {
-        data.forEach((obj) => {
-            placesList.append(renderCard(obj));
+const fetchCards = () => {
+    getInitialCards()
+        .then((res) => res.json())
+        .then((data) => {
+            data.forEach((obj) => {
+                placesList.append(renderCard(obj));
+            });
         });
-    });
+};
+fetchCards();
 
 //Функция изменения данных профиля
 function editProfile() {
@@ -71,7 +80,6 @@ function addNewCard() {
     const closePopupBtn = cardPopup.querySelector(".popup__close");
     const cardForm = cardPopup.querySelector("form");
 
-    const obj = {};
     const nameInput = cardPopup.querySelector(".popup__input_type_card-name");
     const linkInput = cardPopup.querySelector(".popup__input_type_url");
 
@@ -83,10 +91,13 @@ function addNewCard() {
 
     function handleCardFormSubmit(evt) {
         evt.preventDefault();
-        obj["name"] = nameInput.value;
-        obj["link"] = linkInput.value;
+        const name = nameInput.value;
+        const link = linkInput.value;
 
-        placesList.prepend(renderCard(obj));
+        postCard(name, link).then(() => {
+            placesList.innerHTML = "";
+            fetchCards();
+        });
 
         cardForm.removeEventListener("submit", handleCardFormSubmit);
         closeModal(cardPopup);
@@ -102,10 +113,17 @@ placesList.addEventListener("click", ({ target }) => {
 
     switch (true) {
         case classList.contains("card__like-button"):
-            toggleLike(target);
+            const cardID = target.closest(".card").getAttribute("id");
+
+            if (!target.classList.contains("card__like-button_is-active")) {
+                addLikeToCard(cardID).then(() => toggleLike(target));
+            } else {
+                removeLikeFromCard(cardID).then(() => toggleLike(target));
+            }
             break;
         case classList.contains("card__delete-button"):
-            removeCard(target);
+            const cardId = target.parentNode.getAttribute("id");
+            daleteCard(cardId).then(() => removeCard(target));
             break;
         case classList.contains("card__image"):
             toggleImagePopup(target, imagePopup);

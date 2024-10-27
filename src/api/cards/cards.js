@@ -17,7 +17,7 @@ export const postCard = (name, link) => {
     });
 };
 
-export const removeCard = (cardId) => {
+export const daleteCard = (cardId) => {
     return fetch(`${config.baseUrl}/cards/${cardId}`, {
         method: "DELETE",
         headers: config.headers,
@@ -25,15 +25,15 @@ export const removeCard = (cardId) => {
 };
 
 export const addLikeToCard = (cardId) => {
-    return fetch(`${config.baseUrl}/cards/${cardId}`, {
+    return fetch(`${config.baseUrl}/cards/likes/${cardId}`, {
         method: "PUT",
         headers: config.headers,
     });
 };
 
 export const removeLikeFromCard = (cardId) => {
-    return fetch(`${config.baseUrl}/cards/${cardId}`, {
-        method: "PUT",
+    return fetch(`${config.baseUrl}/cards/likes/${cardId}`, {
+        method: "DELETE",
         headers: config.headers,
     });
 };
