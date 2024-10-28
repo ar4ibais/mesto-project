@@ -17,12 +17,12 @@ export const updateUser = (name, about) => {
     });
 };
 
-export const updateAvatar = (avatarUrl) => {
+export const updateAvatar = (avatar) => {
     return fetch(`${config.baseUrl}/users/me/avatar`, {
         method: "PATCH",
         headers: config.headers,
         body: JSON.stringify({
-            avatar: avatarUrl,
+            avatar,
         }),
     });
 };
